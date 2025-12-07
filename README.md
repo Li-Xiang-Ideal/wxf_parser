@@ -106,7 +106,7 @@ The `WXF_PARSER::Encoder` struct (a `std::vector<uint8_t>` with additional funct
 
 // SparseArray[Automatic,#dims,0,{1,{#rowptr,#colindex},#vals}]
 int main() {
-	WXF_PARSER::Encoder enc;
+	WXF_PARSER::Encoder encoder;
 
 	// header of WXF
     encoder.push_ustr(std::vector<uint8_t>{56, 58});
