@@ -34,7 +34,7 @@ its FullForm is
 	Rational[-4,33333333333333444333333335]]]]
 ```
 C++ usage:
-```
+```cpp
 	std::vector<uint8_t> test{ 56, 58, 102, 4, 115, 11, 83, 112, 97, 114, 115, 101, 65, 114, 114, \
 							97, 121, 115, 9, 65, 117, 116, 111, 109, 97, 116, 105, 99, 193, 1, 1, \
 							2, 44, 0, 93, 90, 67, 0, 102, 3, 115, 4, 76, 105, 115, 116, 67, 1, \
@@ -99,10 +99,36 @@ Just do what you want.
 
 # Encoder
 
-The `WXF_PARSER::Encoder` struct (a `std::vector<uint8_t>` with additional functionality) provides various `push_xxx` methods for encoding. We also support template-based encoding.
+The `WXF_PARSER::Encoder` struct (a `std::vector<uint8_t>` with additional functionality) provides various `push_xxx` methods for encoding. For example,
 
-For example,
+```cpp
+#include "wxf_parser.h"
+
+// SparseArray[Automatic,#dims,0,{1,{#rowptr,#colindex},#vals}]
+int main() {
+	WXF_PARSER::Encoder enc;
+
+	// header of WXF
+    encoder.push_ustr(std::vector<uint8_t>{56, 58});
+	// SparseArray[Automatic,
+    encoder.push_function("SparseArray", 4).push_symbol("Automatic");
+    // dims, 0, 
+    encoder.push_packed_array({ 2 }, std::vector<int64_t>({ 4,5 })).push_integer(0);
+    // {1,
+    encoder.push_function("List", 3).push_integer(1);
+	// {rowptr
+    encoder.push_function("List", 2).push_packed_array({ 5 }, std::vector<int8_t>({ 0,2,4,4,7 }));
+	// colindex}
+    encoder.push_packed_array({ 7,1 }, std::vector<int16_t>({ 1,3,2,4,1,3,5 }));
+    // vals}]
+    encoder.push_packed_array({ 7 }, std::vector<double>({ 1.0,2.0,3.0,4.0,5.0,6.0,7.0 }));
+
+    // ....
+}
 ```
+
+We also support template-based encoding as:
+```cpp
 #include "wxf_parser.h"
 
 int main() {
@@ -117,17 +143,12 @@ int main() {
 
 	auto encoder = WXF_PARSER::fullform_to_wxf(ff_template, func_map);
 
-    std::cout << "{ ";
-    for (size_t i = 0; i < encoder.buffer.size(); ++i) {
-        std::cout << (int)encoder.buffer[i];
-        if (i != encoder.buffer.size() - 1)
-            std::cout << ", ";
-	}
-	std::cout << " }" << std::endl;
+    // ...
 }
 ```
+It is more readable.
 
-We get that 
+They both give `encoder.buffer` as a `std::vector<uint8_t>` as 
 ```
 tmp = {56, 58, 102, 4, 115, 11, 83, 112, 97, 114, 115, 101, 65, 114, 114, \
 97, 121, 115, 9, 65, 117, 116, 111, 109, 97, 116, 105, 99, 193, 3, 1, \
