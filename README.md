@@ -146,7 +146,13 @@ int main() {
     // ...
 }
 ```
-It is more readable.
+It is more readable. 
+
+One can turn off the WXF head `{56,58}` in 
+`WXF_PARSER::fullform_to_wxf` by setting 
+`WXF_PARSER::fullform_to_wxf(ff_template, func_map, false)`, which
+allows us to use it not only for the global expression, i.e., 
+we can use templates to generate some `#xxx` in the above level.
 
 They both give `encoder.buffer` as a `std::vector<uint8_t>` as 
 ```
@@ -180,8 +186,8 @@ Since List is widely used, we automatically convert `{ }` to `List[ ]`.
 
 ## Limitations
 
-* High precision numbers and Large integers: Not supported; only standard C++ numeric formats are available
+* High precision numbers and Large integers in templates: Not supported; only standard C++ numeric formats are available. Just define a `#a` and use `push_bigint` or `push_bigreal` for it.
 
-* Performance: For complex expressions, manually handle sub-expressions using push_xxx methods in Encoder for better performance
+* Performance: For complex expressions, manually handle sub-expressions using `push_xxx` methods in Encoder for better performance.
 
-* Robustness: Keep templates simple and handle complicated sub-expressions manually
+* Robustness: Keep templates simple and handle complicated sub-expressions manually.
