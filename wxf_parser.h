@@ -1296,7 +1296,7 @@ namespace WXF_PARSER {
 		const std::unordered_map<std::string, Encoder>& map) {
 		std::unordered_map<std::string, std::function<void(Encoder&)>> func_map;
 		for (const auto& [key, value] : map) {
-			func_map[key] = [value](Encoder& enc) {
+			func_map[key] = [&value](Encoder& enc) {
 				enc.push_ustr(value.buffer);
 				};
 		}
