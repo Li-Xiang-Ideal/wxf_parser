@@ -146,7 +146,13 @@ int main() {
     // ...
 }
 ```
-It is more readable. 
+It is more readable. In templates, we use `#xxxx` to mark sub-expressions, which can be mapped to:
+
+1. A `WXF_PARSER::Encoder`
+
+2. A function `std::function<void(WXF_PARSER::Encoder&)>` for more complex cases
+
+Template placeholders must use only characters: `[0-9,a-z,A-Z,$,{,},[,]]`
 
 One can turn off the WXF head `{56,58}` in 
 `WXF_PARSER::fullform_to_wxf` by setting 
@@ -170,14 +176,6 @@ and in Mathematica, and `Normal@BinaryDeserialize@ByteArray[tmp]` gives
 ```
 {{1., 0, 2., 0, 0}, {0, 3., 0, 4., 0}, {0, 0, 0, 0, 0}, {5., 0, 6., 0, 7.}}.
 ```
-
-In templates, we use `#xxxx` to mark sub-expressions, which can be mapped to:
-
-1. A `WXF_PARSER::Encoder`
-
-2. A function `std::function<void(WXF_PARSER::Encoder&)>` for more complex cases
-
-Template placeholders must use only characters: `[0-9,a-z,A-Z,$,{,},[,]]`
 
 This parser processes FullForm expressions directly. 
 There is no support for infix operators like `_,/, *, ^, %, ...`. 
