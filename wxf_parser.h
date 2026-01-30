@@ -179,6 +179,11 @@ namespace WXF_PARSER {
 		// move from existing buffer
 		Encoder(std::vector<uint8_t>&& buf) : buffer(std::move(buf)) {}
 
+		const size_t size() const { return buffer.size(); }
+		void reserve(const size_t new_size) { buffer.reserve(new_size); }
+		void resize(const size_t new_size) { buffer.resize(new_size); }
+		void resize(const size_t new_size, const uint8_t val) { buffer.resize(new_size, val); }
+
 		// push ustr directly
 		Encoder& push_ustr(const std::vector<uint8_t>& str) { buffer.insert(buffer.end(), str.begin(), str.end()); return *this; }
 		Encoder& push_ustr(const std::string_view str) {
@@ -191,6 +196,30 @@ namespace WXF_PARSER {
 		template<typename T>
 		Encoder& push_ustr(T* start, T* end) {
 			buffer.insert(buffer.end(), (uint8_t*)start, (uint8_t*)end); return *this;
+		}
+
+		// generate data as ustr in the back
+		template<typename T, typename F>
+		Encoder& generate_back_ustr(const size_t len, F&& func) {
+			static_assert(std::is_invocable_r_v<T, F, size_t>, "func should be callable with size_t and return T");
+			size_t old_size = buffer.size();
+			buffer.resize(old_size + len * sizeof(T));
+			T* data_ptr = (T*)(buffer.data() + old_size);
+			for (size_t i = 0; i < len; i++) {
+				data_ptr[i] = func(i);
+			}
+			return *this;
+		}
+
+		// generate transformed data as ustr in the back
+		template<typename T1, typename T2, typename F>
+		Encoder& transform_back_ustr(const T2* src_ptr, const size_t len, F&& func) {
+			static_assert(std::is_invocable_r_v<T1, F, T2>, "func should be callable with T2 and return T1");
+			size_t old_size = buffer.size();
+			buffer.resize(old_size + len * sizeof(T1));
+			T1* data_ptr = (T1*)(buffer.data() + old_size);
+			std::transform(src_ptr, src_ptr + len, data_ptr, func);
+			return *this;
 		}
 
 		Encoder& push_integer(const int64_t val) {
